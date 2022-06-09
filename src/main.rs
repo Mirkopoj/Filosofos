@@ -1,15 +1,15 @@
 use std::thread;
+use std::time;
 
-//#ifndef _N
-//#define _N 5
-//#endif
+use rand::prelude::*;
+
 const _N: usize = 5;
-// 
-//enum{
-//	pensando = 0,
-//	comiendo,
-//};
-// 
+
+enum Estado{
+	Pensando = 0,
+	Comiendo,
+}
+ 
 //std::binary_semaphore tenedores[_N] = {
 //	std::binary_semaphore(1),
 //	std::binary_semaphore(1),
@@ -18,9 +18,15 @@ const _N: usize = 5;
 //	std::binary_semaphore(1),
 //};
 
-fn filosofo(fil_num : usize, &sim : &bool, &estoy : &i32){
-//	int intervalo;
-//	std::cout<<"Filosofo "<<fil_num<<" inicia:"<<std::endl;
+fn filosofo(fil_num : usize, &sim : &bool, &estoy : &usize){
+	let intervalo: time::Duration;
+	println!("El filosofo: {}, inicia.", fil_num);
+
+    while sim {
+       intervalo = time::Duration::from_secs(rand()%10);
+       thread::sleep(intervalo);
+    }
+
 //	while (*sim) {
 //		intervalo = rand()%10;
 //		sleep(intervalo);
@@ -42,9 +48,9 @@ fn filosofo(fil_num : usize, &sim : &bool, &estoy : &i32){
 }
 
 fn main(){
-	let mut threads: Vec<thread::JoinHandle<()>> = Vec::new();
-	let filosofos: [i32;_N] = [0;_N];
-	let sim : bool = true;
+	let mut threads: Vec<thread::JoinHandle<_>> = Vec::new();
+	let filosofos: [usize;_N] = [0;_N];
+	let mut sim : bool = true;
 	let estado: [&str;2] = [
 		"pensando",
 		"comiendo"
@@ -53,24 +59,28 @@ fn main(){
 	for i in 0.._N {
 		threads.push(thread::spawn(move || { filosofo(i, &sim, &filosofos[i]) }));
 	}
-}
 
-//	std::cout<<"Inicio:\n\n";
-//	for(i=0;i<60;i++){
-//		for(int j=0;j<5;j++){
-//			std::cout<<"Filosofo "<<j<<", está: "<<estado[filosofos[j]]<<std::endl;
-//		}
-//		std::cout<<"\n";
-//		sleep(1);
-//	}
-//   
-//	sim = 0;
-//	
-//	for(i=0;i<_N;i++){
-//		threads[i].wait();
-//	}
-//	
-//	std::cout<<"\nFIN";
-//
-////	return 0;
-//}
+    println!("Inicio:\n");
+
+    let un_segundo = time::Duration::from_secs(1);
+    for _ in 0..60 {
+        for i in 0..5 {
+            println!("El filosofo: {}, está: {}", i, estado[filosofos[i]]);
+        }
+        println!();
+        thread::sleep(un_segundo);
+    }
+
+    sim = false;
+
+    for thread in threads {
+        let res = thread.join();
+        match res {
+            Ok(_) => continue,
+            Err(e) => println!("Error: {e:?}"),
+        }
+    }
+
+    println!("Fin");
+
+}
