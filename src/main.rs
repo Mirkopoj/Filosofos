@@ -1,7 +1,7 @@
 use std::thread;
 use std::time;
 
-use rand::prelude::*;
+use rand::Rng;
 
 const _N: usize = 5;
 
@@ -19,17 +19,18 @@ enum Estado{
 //};
 
 fn filosofo(fil_num : usize, &sim : &bool, &estoy : &usize){
-	let intervalo: time::Duration;
+	let mut intervalo: time::Duration;
+    let mut rng_gen = rand::thread_rng();
 	println!("El filosofo: {}, inicia.", fil_num);
 
     while sim {
-       intervalo = time::Duration::from_secs(rand()%10);
+       intervalo = time::Duration::from_secs(rng_gen.gen::<u64>()%10);
        thread::sleep(intervalo);
     }
 
-//	while (*sim) {
-//		intervalo = rand()%10;
-//		sleep(intervalo);
+//	while (*sim) {
+//		intervalo = rand()%10;
+//		sleep(intervalo);
 //		if(*estoy==pensando){
 //			tenedores[(fil_num+(fil_num%2))%_N].acquire(); 
 //			tenedores[((fil_num+1)-(fil_num%2))%_N].acquire(); 
@@ -39,7 +40,7 @@ fn filosofo(fil_num : usize, &sim : &bool, &estoy : &usize){
 //			tenedores[(fil_num+1)%_N].release();
 //			*estoy = pensando;
 //		}
-//	}
+//	}
 //	if(*estoy==comiendo){
 //		tenedores[fil_num].release();
 //		tenedores[(fil_num+1)%_N].release();
